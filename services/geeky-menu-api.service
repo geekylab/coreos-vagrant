@@ -1,0 +1,13 @@
+[Unit]
+      Description=Geeky Menu Admin Api
+      After=geeky-mongo.service
+      Requires=docker.service
+
+      [Service]
+      ExecStartPre=-/usr/bin/docker rm -f GEEKY_MENU_ADMIN_API
+      ExecStart=/usr/bin/docker run -d -p 3000:3000 --name GEEKY_MENU_ADMIN_API johna1203/GeekyMenuAdminApi
+      ExecStop=/usr/bin/docker stop GEEKY_MENU_ADMIN_API
+      Restart=always
+
+      [Install]
+      WantedBy=multi-user.target

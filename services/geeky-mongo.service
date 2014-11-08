@@ -1,0 +1,13 @@
+[Unit]
+      Description=Geeky mongo
+      After=docker.service
+      Requires=docker.service
+
+      [Service]
+      ExecStartPre=-/usr/bin/docker rm -f GEEKY_MONGO
+      ExecStart=/usr/bin/docker run -d -p 27017:27017 -v /home/core/db:/data/db --name GEEKY_MONGO dockerfile/mongodb
+      ExecStop=/usr/bin/docker stop GEEKY_MONGO
+      Restart=always
+
+      [Install]
+      WantedBy=multi-user.target
