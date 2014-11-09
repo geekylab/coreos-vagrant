@@ -30,10 +30,9 @@ Vagrant.configure("2") do |config|
   config.vm.box = "coreos-%s" % $update_channel
   config.vm.box_version = ">= 308.0.1"
   config.vm.box_url = "http://%s.release.core-os.net/amd64-usr/current/coreos_production_vagrant.json" % $update_channel
-
-  config.vm.provider :vmware_fusion do |vb, override|
-    override.vm.box_url = "http://%s.release.core-os.net/amd64-usr/current/coreos_production_vagrant_vmware_fusion.json" % $update_channel
-  end
+#  config.vm.box = "geekyos-%s" % $update_channel
+#  config.vm.box_version = ">= 308.0.1"
+#  config.vm.box_url = "file:///home/johna/src/GeekyMenu/GeekyOSVagrant/geekyosbox.json"
 
   config.vm.provider :virtualbox do |v|
     # On VirtualBox, we don't have guest additions or a functional vboxsf
@@ -48,7 +47,7 @@ Vagrant.configure("2") do |config|
   end
 
   (1..$num_instances).each do |i|
-    config.vm.define vm_name = "core-%02d" % i do |config|
+    config.vm.define vm_name = "geekyos-%02d" % i do |config|
       config.vm.hostname = vm_name
 
       if $enable_serial_logging
@@ -57,13 +56,6 @@ Vagrant.configure("2") do |config|
 
         serialFile = File.join(logdir, "%s-serial.txt" % vm_name)
         FileUtils.touch(serialFile)
-
-        config.vm.provider :vmware_fusion do |v, override|
-          v.vmx["serial0.present"] = "TRUE"
-          v.vmx["serial0.fileType"] = "file"
-          v.vmx["serial0.fileName"] = serialFile
-          v.vmx["serial0.tryNoRxLoss"] = "FALSE"
-        end
 
         config.vm.provider :virtualbox do |vb, override|
           vb.customize ["modifyvm", :id, "--uart1", "0x3F8", "4"]
@@ -77,10 +69,6 @@ Vagrant.configure("2") do |config|
 
       if $expose_geeky_api
         config.vm.network "forwarded_port", guest: 3000, host: ($expose_geeky_api + i - 1), auto_correct: true
-      end
-
-      config.vm.provider :vmware_fusion do |vb|
-        vb.gui = $vb_gui
       end
 
       config.vm.provider :virtualbox do |vb|
