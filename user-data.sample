@@ -31,11 +31,9 @@ coreos:
     content: |
       [Unit]
       Description=Geeky mongo
-      After=docker.service
-      Requires=docker.service
       [Service]
-      ExecStartPre=/usr/bin/docker rm -f GEEKY_MONGO
-      ExecStart=/usr/bin/docker run -p 27017:27017 -v /home/core/db:/data/db --name GEEKY_MONGO dockerfile/mongodb
+      ExecStartPre=-/usr/bin/docker rm -f GEEKY_MONGO
+      ExecStart=/usr/bin/docker run -p 27017:27017 --name GEEKY_MONGO dockerfile/mongodb
       ExecStop=/usr/bin/docker stop GEEKY_MONGO
       Restart=always
       [Install]
@@ -49,10 +47,26 @@ coreos:
       After=geeky-mongo.service
       Requires=geeky-mongo.service
       [Service]
-      ExecStartPre=/usr/bin/docker rm -f GEEKY_MENU_ADMIN_API
+      ExecStartPre=-/usr/bin/docker rm -f GEEKY_MENU_ADMIN_API
       ExecStartPre=-/usr/bin/docker pull geekylab/geeky-menu-admin-api
-      ExecStart=/usr/bin/docker run -p 3000:3000 --link GEEKY_MONGO:GEEKY_MONGO -v /home/core/GeekyMenuAdmin/app:/app:rw --name GEEKY_MENU_ADMIN_API geekylab/geeky-menu-admin-api
+      ExecStart=/home/core/GeekyMenu/GeekyOSServerApp/run_docker.sh
       ExecStop=/usr/bin/docker stop GEEKY_MENU_ADMIN_API
+      Restart=always
+      [Install]
+      WantedBy=multi-user.target
+  - name: geeky-menu-cloud-api.service
+    command: start
+    runtime: no
+    content: |
+      [Unit]
+      Description=Geeky Menu Cloud Api
+      After=geeky-mongo.service
+      Requires=geeky-mongo.service
+      [Service]
+      ExecStartPre=-/usr/bin/docker rm -f GEEKY_MENU_CLOUD_APP
+      ExecStartPre=-/usr/bin/docker pull geekylab/geeky-menu-admin-api
+      ExecStart=/home/core/GeekyMenu/GeekyMenuCloudApp/run_docker.sh
+      ExecStop=/usr/bin/docker stop GEEKY_MENU_CLOUD_APP
       Restart=always
       [Install]
       WantedBy=multi-user.target

@@ -1,5 +1,8 @@
-# CoreOS Vagrant
+# GeekyOS (CoreOS Vagrant)
 
+# This is fork of CoreOS personalizing it to run on my project.
+
+---------------------
 This repo provides a template Vagrantfile to create a CoreOS virtual machine using the VirtualBox software hypervisor.
 After setup is complete you will have a single CoreOS virtual machine running on your local machine.
 
