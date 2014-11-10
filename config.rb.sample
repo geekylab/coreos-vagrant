@@ -42,8 +42,11 @@ $update_channel='stable'
 #   export DOCKER_HOST='tcp://127.0.0.1:2375'
 $expose_docker_tcp=12375
 $expose_geeky_api=3000
+$expose_geeky_cloud_api=8080
 
 # Setting for VirtualBox VMs
 $vb_gui = false
 $vb_memory = 512
 $vb_cpus = 1
+
+$geeky_menu_path = File.expand_path(File.dirname(__FILE__)) + '/../'
