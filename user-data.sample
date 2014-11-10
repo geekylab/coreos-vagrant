@@ -2,12 +2,12 @@
 
 ---
 coreos:
-#  etcd:
-#    addr: $public_ipv4:4001
-#    peer-addr: $public_ipv4:7001
+  etcd:
+    addr: $public_ipv4:4001
+    peer-addr: $public_ipv4:7001
 #    discovery: https://discovery.etcd.io/1e30b9b377f077b2be60ce521c13f163
-#  fleet:
-#    public-ip: $public_ipv4
+  fleet:
+    public-ip: $public_ipv4
   units:
   - name: etcd.service
     command: start
@@ -31,7 +31,10 @@ coreos:
     content: |
       [Unit]
       Description=Geeky mongo
+      After=docker.service
+      Requires=docker.service
       [Service]
+      TimeoutStartSec=0
       ExecStartPre=-/usr/bin/docker rm -f GEEKY_MONGO
       ExecStart=/usr/bin/docker run -p 27017:27017 --name GEEKY_MONGO dockerfile/mongodb
       ExecStop=/usr/bin/docker stop GEEKY_MONGO
@@ -47,8 +50,9 @@ coreos:
       After=geeky-mongo.service
       Requires=geeky-mongo.service
       [Service]
+      TimeoutStartSec=0
       ExecStartPre=-/usr/bin/docker rm -f GEEKY_MENU_ADMIN_API
-      ExecStartPre=-/usr/bin/docker pull geekylab/geeky-menu-admin-api
+      ExecStartPre=/usr/bin/docker pull geekylab/geeky-menu-admin-api
       ExecStart=/home/core/GeekyMenu/GeekyOSServerApp/run_docker.sh
       ExecStop=/usr/bin/docker stop GEEKY_MENU_ADMIN_API
       Restart=always
@@ -63,8 +67,9 @@ coreos:
       After=geeky-mongo.service
       Requires=geeky-mongo.service
       [Service]
+      TimeoutStartSec=0
       ExecStartPre=-/usr/bin/docker rm -f GEEKY_MENU_CLOUD_APP
-      ExecStartPre=-/usr/bin/docker pull geekylab/geeky-menu-admin-api
+      ExecStartPre=/usr/bin/docker pull geekylab/geeky-menu-admin-api
       ExecStart=/home/core/GeekyMenu/GeekyMenuCloudApp/run_docker.sh
       ExecStop=/usr/bin/docker stop GEEKY_MENU_CLOUD_APP
       Restart=always
