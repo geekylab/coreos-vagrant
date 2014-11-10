@@ -1,0 +1,58 @@
+#cloud-config
+
+---
+coreos:
+#  etcd:
+#    addr: $public_ipv4:4001
+#    peer-addr: $public_ipv4:7001
+#    discovery: https://discovery.etcd.io/1e30b9b377f077b2be60ce521c13f163
+#  fleet:
+#    public-ip: $public_ipv4
+  units:
+  - name: etcd.service
+    command: start
+  - name: fleet.service
+    command: start
+  - name: docker-tcp.socket
+    command: start
+    enable: true
+    content: |
+      [Unit]
+      Description=Docker Socket for the API
+      [Socket]
+      ListenStream=2375
+      Service=docker.service
+      BindIPv6Only=both
+      [Install]
+      WantedBy=sockets.target
+  - name: geeky-mongo.service
+    command: start
+    runtime: no
+    content: |
+      [Unit]
+      Description=Geeky mongo
+      After=docker.service
+      Requires=docker.service
+      [Service]
+      ExecStartPre=/usr/bin/docker rm -f GEEKY_MONGO
+      ExecStart=/usr/bin/docker run -p 27017:27017 -v /home/core/db:/data/db --name GEEKY_MONGO dockerfile/mongodb
+      ExecStop=/usr/bin/docker stop GEEKY_MONGO
+      Restart=always
+      [Install]
+      WantedBy=multi-user.target
+  - name: geeky-menu-api.service
+    command: start
+    runtime: no
+    content: |
+      [Unit]
+      Description=Geeky Menu Admin Api
+      After=geeky-mongo.service
+      Requires=geeky-mongo.service
+      [Service]
+      ExecStartPre=/usr/bin/docker rm -f GEEKY_MENU_ADMIN_API
+      ExecStartPre=-/usr/bin/docker pull geekylab/geeky-menu-admin-api
+      ExecStart=/usr/bin/docker run -p 3000:3000 --link GEEKY_MONGO:GEEKY_MONGO -v /home/core/GeekyMenuAdmin/app:/app:rw --name GEEKY_MENU_ADMIN_API geekylab/geeky-menu-admin-api
+      ExecStop=/usr/bin/docker stop GEEKY_MENU_ADMIN_API
+      Restart=always
+      [Install]
+      WantedBy=multi-user.target
