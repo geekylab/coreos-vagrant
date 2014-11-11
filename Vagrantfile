@@ -15,11 +15,8 @@ $enable_serial_logging = false
 $vb_gui = false
 $vb_memory = 1024
 $vb_cpus = 1
-
-$expose_geeky_host_api=3000
-$expose_geeky_guest_api=3000
-$expose_geeky_cloud_host_api=80
-$expose_geeky_cloud_guest_api=8080
+$expose_geeky_api = 3000
+$expose_geeky_cloud_api = 8080
 
 # Attempt to apply the deprecated environment variable NUM_INSTANCES to
 # $num_instances while allowing config.rb to override it
@@ -72,12 +69,12 @@ Vagrant.configure("2") do |config|
         config.vm.network "forwarded_port", guest: 2375, host: ($expose_docker_tcp + i - 1), auto_correct: true
       end
 
-      if $expose_geeky_guest_api && $expose_geeky_host_api
-        config.vm.network "forwarded_port", guest: $expose_geeky_guest_api, host: ($expose_geeky_host_api + i - 1), auto_correct: true
+      if $expose_geeky_cloud_api
+        config.vm.network "forwarded_port", guest: $expose_geeky_api, host: ($expose_geeky_api + i - 1), auto_correct: true
       end
 
-      if $expose_geeky_cloud_host_api && $expose_geeky_cloud_guest_api
-        config.vm.network "forwarded_port", guest: $expose_geeky_cloud_guest_api, host: ($expose_geeky_cloud_host_api + i - 1), auto_correct: true
+      if $expose_geeky_cloud_api
+        config.vm.network "forwarded_port", guest: $expose_geeky_cloud_api, host: ($expose_geeky_cloud_api + i - 1), auto_correct: true
       end
 
       config.vm.provider :virtualbox do |vb|
@@ -90,8 +87,7 @@ Vagrant.configure("2") do |config|
       config.vm.network :private_network, ip: ip
 
       # Uncomment below to enable NFS for sharing the host machine into the coreos-vagrant VM.
-#      config.vm.synced_folder ".", "/home/core/share", id: "core", :nfs => true, :mount_options => ['nolock,vers=3,udp']
-      config.vm.synced_folder $geeky_menu_path, "/home/core/GeekyMenu", id: "core", :nfs => true, :mount_options => ['nolock,vers=3,udp']
+      config.vm.synced_folder "/home/johna/src/GeekyMenu", "/home/core/GeekyMenu", id: "core", :nfs => true, :mount_options => ['nolock,vers=3,udp']
 
       if File.exist?(CLOUD_CONFIG_PATH)
         config.vm.provision :file, :source => "#{CLOUD_CONFIG_PATH}", :destination => "/tmp/vagrantfile-user-data"
