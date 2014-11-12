@@ -69,6 +69,8 @@ Vagrant.configure("2") do |config|
         config.vm.network "forwarded_port", guest: 2375, host: ($expose_docker_tcp + i - 1), auto_correct: true
       end
 
+      config.vm.network "forwarded_port", guest: 27017, host: (27017 + i - 1), auto_correct: true
+
       if $expose_geeky_cloud_api
         config.vm.network "forwarded_port", guest: $expose_geeky_api, host: ($expose_geeky_api + i - 1), auto_correct: true
       end
